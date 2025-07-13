@@ -1,0 +1,49 @@
+---
+description: Project overview and context for ygg-rss-proxy
+globs: []
+alwaysApply: true
+---
+
+# YGG-RSS-Proxy Project Context
+
+## Project Purpose
+This application serves as a proxy for YggTorrent RSS feeds, handling authentication and bypassing Cloudflare protection using FlareSolverr. It enables torrent clients to access YGG RSS feeds without exposing credentials or handling complex authentication flows.
+
+## Architecture Overview
+- **Flask Web Application**: Serves RSS proxy endpoints
+- **Session Management**: Maintains YGG authentication state
+- **FlareSolverr Integration**: Bypasses Cloudflare protection when needed
+- **Docker Containerization**: Production deployment with docker-compose
+- **Security Focus**: Credential protection and log redaction
+
+## Key Components
+1. **app.py**: Main Flask application with routes
+2. **rss.py**: RSS feed processing and URL rewriting
+3. **torrent.py**: Torrent file download handling
+4. **auth.py**: YGG authentication logic
+5. **session_manager.py**: Session persistence with SQLAlchemy
+6. **settings.py**: Pydantic-based configuration management
+7. **fspy/**: FlareSolverr integration module
+
+## Technology Stack
+- Python 3.11+ with Poetry dependency management
+- Flask with SQLAlchemy for web framework and sessions
+- Pydantic for configuration and data validation
+- Loguru for structured logging with security redaction
+- Requests for HTTP client functionality
+- LXML for XML/HTML parsing
+- Docker for containerization
+
+## Security Considerations
+- Never expose YGG credentials in logs or responses
+- Use environment variables and Docker secrets for configuration
+- Implement comprehensive log redaction for sensitive data
+- Validate all user inputs and external URLs
+- Maintain session security with proper encryption
+
+## Development Workflow
+- Use Poetry for dependency management
+- Follow PEP 8 coding standards
+- Implement comprehensive error handling
+- Write tests for critical functionality
+- Use Docker for consistent development environment

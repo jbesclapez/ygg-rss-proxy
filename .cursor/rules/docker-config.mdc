@@ -1,0 +1,52 @@
+---
+description: Docker and configuration management for ygg-rss-proxy
+globs: ["Dockerfile", "docker-compose.yml", "**/settings.py", "pyproject.toml"]
+alwaysApply: false
+---
+
+# Docker and Configuration Management
+
+## Docker Best Practices
+- Use multi-stage builds for smaller production images
+- Set appropriate file permissions for config directories
+- Use health checks for service monitoring
+- Follow principle of least privilege for user permissions
+- Mount config and logs as volumes for persistence
+
+## Environment Configuration
+- All settings must be configurable via environment variables
+- Support Docker Secrets for sensitive values (in `/run/secrets/`)
+- Provide `.env` file support for development
+- Use appropriate defaults for non-sensitive settings
+
+## Container Integration
+- Use container names for inter-service communication (flaresolverr, ygg-rss-proxy)
+- Expose ports only when necessary (internal services use `expose:`)
+- Set proper timezone configuration (`TZ` environment variable)
+- Use restart policies appropriate for production (`unless-stopped`)
+
+## Configuration Patterns
+```python
+# Follow this pattern for new settings
+class Settings(BaseSettings):
+    new_setting: str = "default_value"
+    new_port: int = 8080
+    new_flag: bool = False
+    
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        secrets_dir="/run/secrets", 
+        env_file_encoding="utf-8"
+    )
+```
+
+## Volume Mounts
+- Config directory: `/app/config` (persistent storage)
+- Logs directory: `/app/config/logs` (with rotation)
+- Database: `/app/config/rss-proxy.db` (SQLite persistence)
+
+## Dependencies Management
+- Use Poetry for Python dependency management
+- Pin major versions in pyproject.toml
+- Keep dependencies minimal and security-focused
+- Regular security updates for base images

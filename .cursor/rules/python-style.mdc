@@ -1,0 +1,43 @@
+---
+description: Python coding standards and conventions for ygg-rss-proxy
+globs: ["**/*.py"]
+alwaysApply: false
+---
+
+# Python Coding Standards for ygg-rss-proxy
+
+## Code Style & Structure
+- Follow PEP 8 standards with 4-space indentation
+- Use type hints for all function parameters and return values
+- Prefer descriptive variable names (e.g., `ygg_session`, `response_data`)
+- Keep functions focused and under 50 lines when possible
+- Use docstrings for all public functions and classes
+
+## Import Organization
+- Group imports: standard library, third-party, local imports
+- Use absolute imports from the `ygg_rss_proxy` package
+- Sort imports alphabetically within each group
+
+## Error Handling
+- Use specific exception types rather than bare `except:`
+- Always log errors using the configured loguru logger
+- Include meaningful error messages with context
+- Use `TimeoutError` for timeout-related exceptions
+
+## Security Practices
+- Never log sensitive data (passwords, session cookies, passkeys)
+- Use the configured SecretFilter for log redaction
+- Validate all user inputs using Pydantic models
+- Use environment variables for all configuration
+
+## Performance Guidelines
+- Use session pooling for HTTP requests
+- Implement proper timeout handling for external API calls
+- Cache session data appropriately using Flask-SQLAlchemy
+- Use `orjson` for JSON serialization when performance matters
+
+## Dependencies
+- Prefer using existing project dependencies over adding new ones
+- Use `requests` for HTTP calls with proper session management
+- Use `lxml` for XML/HTML parsing
+- Use `pydantic` for data validation and settings

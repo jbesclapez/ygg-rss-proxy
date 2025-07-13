@@ -1,0 +1,52 @@
+---
+description: Testing patterns and fspy module guidelines
+globs: ["tests/**/*.py", "**/fspy/**/*.py"]
+alwaysApply: false
+---
+
+# Testing and FlareSolverr Integration
+
+## Testing Patterns
+- Use pytest for all tests
+- Create meaningful test names that describe the behavior being tested
+- Mock external dependencies (YGG API, FlareSolverr)
+- Test error conditions and edge cases
+- Use fixtures for common test data and setup
+
+## Test Structure
+```python
+def test_function_name_when_condition_then_expected_behavior():
+    # Arrange
+    setup_data = ...
+    
+    # Act
+    result = function_under_test(setup_data)
+    
+    # Assert
+    assert result == expected_value
+```
+
+## FlareSolverr Integration (fspy module)
+- Handle FlareSolverr unavailability gracefully
+- Implement proper timeout handling for solver requests
+- Use retry mechanisms with exponential backoff
+- Define clear exception types for different failure modes
+- Log solver performance metrics for monitoring
+
+## Test Categories
+1. **Unit Tests**: Individual functions and classes
+2. **Integration Tests**: Flask routes and external API interactions
+3. **Security Tests**: Input validation and authentication flows
+4. **Performance Tests**: Response times and memory usage
+
+## Mocking Guidelines
+- Mock `requests` calls to YGG and FlareSolverr
+- Use `pytest.fixture` for reusable test data
+- Mock session management for predictable test conditions
+- Simulate network failures and timeouts
+
+## Test Data Security
+- Never use real YGG credentials in tests
+- Use fake/sanitized data that matches production patterns
+- Ensure test logs don't contain sensitive information
+- Mock authentication responses rather than making real calls

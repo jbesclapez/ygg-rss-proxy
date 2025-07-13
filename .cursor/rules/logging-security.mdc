@@ -1,0 +1,51 @@
+---
+description: Logging and security practices for ygg-rss-proxy
+globs: ["**/*.py"]
+alwaysApply: true
+---
+
+# Logging and Security Guidelines
+
+## Logging Practices
+- Always use the configured `loguru` logger from `ygg_rss_proxy.logging_config`
+- Use appropriate log levels: DEBUG for development, INFO for normal operation, ERROR for exceptions
+- Include context in log messages (function name, operation, relevant IDs)
+- Never log sensitive data - the SecretFilter will catch patterns but be proactive
+
+### Log Level Guidelines
+```python
+logger.debug("Processing RSS request with parameters")
+logger.info("Successfully authenticated YGG session")
+logger.warning("Session expired, attempting re-authentication")
+logger.error("Failed to connect to YGG API")
+```
+
+## Security-Sensitive Data
+These patterns MUST NEVER appear in logs or responses:
+- YGG credentials (`ygg_user`, `ygg_pass`)
+- Session cookies (`cf_clearance`, `ygg_` cookies)
+- Passkeys in RSS URLs
+- Any authentication tokens or secrets
+
+## Safe Logging Examples
+```python
+# Good - no sensitive data
+logger.info("RSS feed request processed successfully")
+logger.debug(f"Processing torrent download for ID: {safe_id}")
+
+# Bad - contains sensitive data
+logger.debug(f"Using passkey: {passkey}")  # DON'T DO THIS
+```
+
+## Error Context
+When logging errors, include:
+- Operation being performed
+- Non-sensitive parameters
+- Error type and message
+- Stack trace for debugging (automatically handled by loguru)
+
+## Environment Variables
+- All configuration must use Pydantic Settings
+- Sensitive values must be loaded from environment or Docker secrets
+- Provide safe defaults for non-sensitive settings
+- Use the `SettingsConfigDict` pattern for `.env` file support

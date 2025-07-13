@@ -1,0 +1,43 @@
+---
+description: Flask application patterns and best practices for ygg-rss-proxy
+globs: ["**/app.py", "**/rss.py", "**/torrent.py", "**/auth.py"]
+alwaysApply: false
+---
+
+# Flask Application Patterns for ygg-rss-proxy
+
+## Route Design
+- Keep route handlers thin - delegate business logic to separate functions
+- Use descriptive route names that match the functionality
+- Always include proper HTTP method specifications
+- Return appropriate HTTP status codes (200, 400, 404, 500, etc.)
+
+## Request Handling
+- Validate query parameters using `request.args.get()` with defaults
+- Extract query strings using `request.query_string.decode("utf-8")`
+- Handle missing or invalid parameters gracefully
+- Use the session manager for YGG authentication state
+
+## Response Patterns
+- Use `Response` object for custom headers and status codes
+- Set appropriate Content-Type headers for RSS feeds (`application/rss+xml`)
+- Return JSON responses using `jsonify()` for API endpoints
+- Include proper error responses with meaningful messages
+
+## Session Management
+- Always call `init_session()` in `before_request`
+- Use `get_session()` to retrieve the authenticated YGG session
+- Handle session expiration and re-authentication automatically
+- Store session data using Flask-SQLAlchemy backend
+
+## Error Handling
+- Catch `TimeoutError` exceptions and log appropriately
+- Return user-friendly error messages without exposing internal details
+- Use proper HTTP status codes for different error types
+- Log all errors with sufficient context for debugging
+
+## Security Considerations
+- Never expose YGG credentials in responses
+- Sanitize all user inputs before processing
+- Use the configured secret key for session encryption
+- Validate all external URLs and parameters
