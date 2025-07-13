@@ -19,7 +19,13 @@ def get_rss_feed(query_params, requests_session: requests.Session) -> requests.R
 
 @timeout_decorator.timeout(30, exception_message=f"Timeout after 30 seconds")
 def replace_torrent_links(rss_content) -> Any:
-    parser = etree.XMLParser(recover=True)
+    # Secure XML parser with XXE protection
+    parser = etree.XMLParser(
+        recover=True,
+        resolve_entities=False,  # Disable external entity processing (XXE protection)
+        no_network=True,         # Disable network access for extra security
+        dtd_validation=False     # Disable DTD processing
+    )
     tree = etree.fromstring(rss_content, parser)
 
     for enclosure in tree.xpath("//item/enclosure"):
