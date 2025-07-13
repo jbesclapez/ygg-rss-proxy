@@ -5,10 +5,9 @@ services:
    qbittorrent:
       image: lscr.io/linuxserver/qbittorrent:latest
       container_name: qbittorrent
+      env_file:
+         - .env
       environment:
-         PUID: 1000
-         PGID: 1000
-         TZ: Europe/Paris
          WEBUI_PORT: 8080
       volumes:
          - ./config:/config
@@ -25,12 +24,12 @@ services:
       container_name: ygg-rss-proxy
       expose:
          - 8080
+      env_file:
+         - .env
       environment:
-         TZ: Europe/Paris
-         YGG_USER: 'StOpCouDflaE'
-         YGG_PASS: 'BaDaSS'
+         # Override specific values for containerized environment
          FLARESOLVERR_HOST: flaresolverr
-         LOG_LEVEL: INFO
+         RSS_HOST: ygg-rss-proxy
       volumes:
          - ./config:/app/config
       restart: unless-stopped
@@ -40,9 +39,9 @@ services:
    flaresolverr:
       image: ghcr.io/flaresolverr/flaresolverr:latest
       container_name: flaresolverr
+      env_file:
+         - .env
       environment:
-         TZ: Europe/Paris
-         LOG_LEVEL: info
          CAPTCHA_SOLVER: none
       expose:
          - 8191

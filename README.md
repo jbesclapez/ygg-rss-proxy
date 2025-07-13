@@ -8,6 +8,37 @@ Please be aware of this and make sure to use flaresolver accordingly to avoid an
 
 Big thanks to [@FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) for their amazing work!
 
+## 🔧 Quick Setup
+
+### 1. Create Environment File
+
+**IMPORTANT:** Create a `.env` file from the template:
+
+```bash
+cp env.example .env
+```
+
+Then edit `.env` and update these **REQUIRED** variables:
+```bash
+YGG_USER=your_actual_ygg_username
+YGG_PASS=your_actual_ygg_password
+```
+
+### 2. Generate Secure Secret Key (Recommended)
+
+For production use, generate a secure secret key:
+
+```bash
+python -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))"
+```
+
+Copy the output and replace the `SECRET_KEY` value in your `.env` file.
+
+### 3. Run with Docker Compose
+
+```bash
+docker-compose up -d
+```
 
 ## Description
 
@@ -30,8 +61,12 @@ Le scripte peut désormais être configuré en utilisant des variables d'environ
 
 ### Variables d'Environnement
 
-- `YGG_USER` : Votre nom d'utilisateur pour l'authentification sur le site YGG. Par défaut. (OBLIGATOIRE)
-- `YGG_PASS` : Votre mot de passe pour l'authentification sur le site YGG. Par défaut. (OBLIGATOIRE)
+#### ⚠️ OBLIGATOIRES
+- `YGG_USER` : Votre nom d'utilisateur pour l'authentification sur le site YGG. **(OBLIGATOIRE)**
+- `YGG_PASS` : Votre mot de passe pour l'authentification sur le site YGG. **(OBLIGATOIRE)**
+- `SECRET_KEY` : Clé secrète pour la sécurité des sessions. Générez une clé aléatoirement ! **(RECOMMANDÉ)**
+
+#### Optionnelles (avec valeurs par défaut)
 - `YGG_URL`: L'URL du site YGG. définie par default.
 - `RSS_HOST`: L'hôte sur lequel le serveur RSS est en cours d'exécution. Par défaut, il est défini sur 'localhost'. **C'est ici que l'on peut mettre le noms de container si l'on utilise docker compose.**
 - `RSS_PORT`: Le port sur lequel le serveur RSS est en cours d'exécution. Par défaut, il est défini sur '8080'.
@@ -47,9 +82,6 @@ Le scripte peut désormais être configuré en utilisant des variables d'environ
 - `LOG_LEVEL`: Le niveau de journalisation pour le serveur proxy. Par défaut, il est défini sur 'INFO'.
 - `LOG_REDACTED`: Si les journaux doivent être anonymisés. Par défaut, il est défini sur 'True'.
 - `DB_PATH`: Le chemin de la base de données SQLite pour le serveur proxy. Par défaut, il est défini sur '/app/config/rss-proxy.db'. Attention c'est le chemin dans le container.
-- `SECRET_KEY`: La clé secrète utilisée pour la signature des cookies de session. Par défaut, il est défini sur 'superkey_that_can_be_changed'. Sécurité suplémentaire pour chiffré la base de donnée.
-
-
 
 ## Comment Utiliser
 
@@ -68,20 +100,31 @@ C'est pour illustré l'utilisation de l'application avec d'autres services.
 
 **Attention, Flaresolverr est un super projet 🤩 mais il peut être très gourmand en ressources si des petits malins trouve votre instance et ne doit pas être exoposé en dehors de votre réseau local. Il est donc recommandé de ne pas binder le port 8191 sur l'hôte. On utilisera donc le nom du container pour communiquer entre les deux pour rester dans le réseau docker.**
 
-1. **Créer un fichier `docker-compose.yml`**
+1. **Créer un fichier `.env` avec vos identifiants**
+
+   ```bash
+   # Copier le fichier template
+   cp env.example .env
+   
+   # Éditer le fichier .env et mettre vos vraies informations
+   YGG_USER=your_real_username
+   YGG_PASS=your_real_password
+   ```
+
+2. **Le fichier `docker-compose.yml` est déjà configuré**
+
+   Le fichier utilise maintenant des variables d'environnement sécurisées:
 
    ```yaml
    version: "3.8"
 
    services:
-
       qbittorrent:
          image: lscr.io/linuxserver/qbittorrent:latest
          container_name: qbittorrent
+         env_file:
+            - .env
          environment:
-            PUID: 1000
-            PGID: 1000
-            TZ: Europe/Paris
             WEBUI_PORT: 8080
          volumes:
             - ./config:/config
@@ -97,14 +140,12 @@ C'est pour illustré l'utilisation de l'application avec d'autres services.
          container_name: ygg-rss-proxy
          expose:
             - 8080
+         env_file:
+            - .env
          environment:
-            TZ: Europe/Paris
-            YGG_USER: 'User'
-            YGG_PASS: 'passw0rd'
+            # Override specific values for containerized environment
             FLARESOLVERR_HOST: flaresolverr
             RSS_HOST: ygg-rss-proxy
-            RSS_PORT: 8080
-            LOG_LEVEL: INFO
          volumes:
             - ./config:/app/config
          restart: unless-stopped
@@ -114,16 +155,16 @@ C'est pour illustré l'utilisation de l'application avec d'autres services.
       flaresolverr:
          image: ghcr.io/flaresolverr/flaresolverr:latest
          container_name: flaresolverr
+         env_file:
+            - .env
          environment:
-            TZ: Europe/Paris
-            LOG_LEVEL: info
             CAPTCHA_SOLVER: none
          expose:
             - 8191
          restart: unless-stopped
    ```
 
-2. **Exécuter Docker Compose**
+3. **Exécuter Docker Compose**
 
    ```bash
    docker-compose up -d
