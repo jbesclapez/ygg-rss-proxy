@@ -19,11 +19,10 @@ services:
       restart: unless-stopped
 
    ygg-rss-proxy:
-      image: ygg-rss-proxy:latest
-      build: .
+      image: ghcr.io/jbesclapez/ygg-rss-proxy:latest
       container_name: ygg-rss-proxy
-      expose:
-         - 8080
+      ports:
+         - 8081:8080
       env_file:
          - .env
       environment:

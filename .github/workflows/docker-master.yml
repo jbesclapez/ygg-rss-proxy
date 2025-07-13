@@ -1,9 +1,9 @@
-name: Build and Push Docker image to GitHub Packages on Develop Branch
+name: Build and Push Docker image to GitHub Packages on Master Branch
 
 on:
   push:
     branches:
-      - develop
+      - master
 
 jobs:
   build:
@@ -38,6 +38,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/jbesclapez/ygg-rss-proxy:develop
+            ghcr.io/jbesclapez/ygg-rss-proxy:latest
+            ghcr.io/jbesclapez/ygg-rss-proxy:master
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=max 
