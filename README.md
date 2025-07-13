@@ -48,15 +48,59 @@ Copy the output and replace the `SECRET_KEY` value in your `.env` file.
 docker-compose up -d
 ```
 
+## 🔒 Security Improvements
+
+This application has undergone a comprehensive security audit and implementation of critical security enhancements:
+
+### ✅ **Vulnerabilities Fixed**
+- **Hardcoded Credentials Removal**: All sensitive credentials moved to environment variables with secure `.env` file setup
+- **Mandatory SECRET_KEY Protection**: Application now requires and validates secure SECRET_KEY with startup enforcement
+- **XXE Attack Prevention**: Secure XML parser implementation prevents XML External Entity attacks
+- **Configuration Security**: Fixed hardcoded URLs and implemented proper configuration management
+- **Complete Error Handling**: Fixed incomplete exception handling that could cause application crashes
+
+### 🛡️ **Security Features**
+- **Credential Protection**: YGG credentials and session data never exposed in logs or responses
+- **Session Security**: Strong SECRET_KEY validation protects Flask sessions and authentication cookies
+- **XML Security**: Parser configured to prevent external entity attacks, file disclosure, and SSRF
+- **Robust Error Handling**: Comprehensive exception coverage with appropriate HTTP status codes
+- **Secure Logging**: Loguru integration with automatic sensitive data redaction
+
+### 🩺 **Health Monitoring**
+New `/health` endpoint provides comprehensive connectivity testing:
+```bash
+curl http://localhost:8080/health
+```
+
+Returns JSON status for:
+- **FlareSolverr connectivity** and version information
+- **Internet connectivity** via external service
+- **YGG site reachability** (expects Cloudflare protection)
+
+**Example response:**
+```json
+{
+  "status": "healthy",
+  "flaresolverr": "✅ Connected (v3.3.16)",
+  "internet": "✅ Connected",
+  "ygg": "✅ Reachable (Cloudflare protected)",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
 ## Description
 
-`ygg-rss-proxy` est une application Python qui sert de proxy pour récupérer des flux RSS et des fichiers torrent depuis un site protégé nécessitant une authentification. Cette application est conteneurisée à l'aide de Docker et utilise Poetry pour la gestion des dépendances.
+`ygg-rss-proxy` est une application Python sécurisée qui sert de proxy pour récupérer des flux RSS et des fichiers torrent depuis un site protégé nécessitant une authentification. Cette application est conteneurisée à l'aide de Docker et utilise Poetry pour la gestion des dépendances.
 
 ## Fonctionnalités
 
-- Authentifie sur le site et récupère les cookies de session.
-- Récupère et modifie les flux RSS pour remplacer les URL de téléchargement par des URL de proxy.
-- Récupère les fichiers torrent via le proxy avec authentification.
+- **Authentification Sécurisée**: Authentifie sur le site et récupère les cookies de session avec protection des credentials.
+- **Proxy RSS Intelligent**: Récupère et modifie les flux RSS pour remplacer les URL de téléchargement par des URL de proxy.
+- **Téléchargement Torrent**: Récupère les fichiers torrent via le proxy avec authentification.
+- **Protection XXE**: Parser XML sécurisé prévenant les attaques d'entités externes.
+- **Monitoring de Santé**: Endpoint `/health` pour surveiller la connectivité FlareSolverr, Internet et YGG.
+- **Gestion d'Erreurs Robuste**: Gestion complète des exceptions avec codes HTTP appropriés.
+- **Logging Sécurisé**: Redaction automatique des données sensibles dans les journaux.
 
 ## Exigences
 
@@ -186,11 +230,35 @@ C'est pour illustré l'utilisation de l'application avec d'autres services.
 
 L'URL RSS à utiliser est la même que sur le site concerné, mais vous devez changer le nom de domaine de `www.ygg.re` à `localhost:8080` ou tout autre HOST que vous avez définie dans les variable `RSS_HOST` `RSS_PORT`. Assurez-vous de bien conserver tous les paramètres car notre script les réutilise.
 
-### Exemple
+### Exemple d'URL RSS
 
 URL d'origine : `https://www.ygg.re/rss?action=generate&type=subcat&id=2183&passkey=xxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 URL à utiliser dans le client torrent : `http://localhost:8080/rss?action=generate&type=subcat&id=2183&passkey=xxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+### Surveillance et Monitoring
+
+#### Endpoint de Santé
+Utilisez l'endpoint `/health` pour vérifier le statut de l'application:
+
+```bash
+# Vérification rapide du statut
+curl http://localhost:8080/health
+
+# Avec formatage JSON (si jq est installé)
+curl http://localhost:8080/health | jq
+```
+
+Cet endpoint vérifie:
+- ✅ **Connectivité FlareSolverr**: Version et disponibilité
+- ✅ **Connectivité Internet**: Accès aux services externes
+- ✅ **Accessibilité YGG**: Vérification que le site est joignable
+
+#### Codes de Statut HTTP
+- **200**: Tout fonctionne correctement
+- **500**: Erreur serveur interne
+- **502**: Problème de connectivité (FlareSolverr/YGG)
+- **504**: Timeout de connexion
 
 
 ## Structure du Projet
