@@ -22,17 +22,25 @@ Then edit `.env` and update these **REQUIRED** variables:
 ```bash
 YGG_USER=your_actual_ygg_username
 YGG_PASS=your_actual_ygg_password
+SECRET_KEY=your_generated_secure_key_here
 ```
 
-### 2. Generate Secure Secret Key (Recommended)
+### 2. Generate Secure Secret Key (REQUIRED!)
 
-For production use, generate a secure secret key:
+⚠️ **CRITICAL**: The application will NOT start without a secure SECRET_KEY!
+
+Generate a secure secret key:
 
 ```bash
 python -c "import secrets; print('SECRET_KEY=' + secrets.token_hex(32))"
 ```
 
 Copy the output and replace the `SECRET_KEY` value in your `.env` file.
+
+**Security Requirements:**
+- Must be at least 32 characters long
+- Cannot use default/weak values  
+- Protects your YGG authentication cookies and session data
 
 ### 3. Run with Docker Compose
 
@@ -64,7 +72,11 @@ Le scripte peut désormais être configuré en utilisant des variables d'environ
 #### ⚠️ OBLIGATOIRES
 - `YGG_USER` : Votre nom d'utilisateur pour l'authentification sur le site YGG. **(OBLIGATOIRE)**
 - `YGG_PASS` : Votre mot de passe pour l'authentification sur le site YGG. **(OBLIGATOIRE)**
-- `SECRET_KEY` : Clé secrète pour la sécurité des sessions. Générez une clé aléatoirement ! **(RECOMMANDÉ)**
+- `SECRET_KEY` : Clé secrète pour la sécurité des sessions Flask. **(OBLIGATOIRE - minimum 32 caractères)**
+  - ⚠️ **CRITIQUE**: L'application ne démarrera PAS sans cette clé
+  - Protège vos cookies d'authentification YGG et données de session
+  - Générez avec: `python -c "import secrets; print(secrets.token_hex(32))"`
+  - Ne peut pas utiliser de valeurs par défaut/faibles
 
 #### Optionnelles (avec valeurs par défaut)
 - `YGG_URL`: L'URL du site YGG. définie par default.
